@@ -5,7 +5,7 @@ Build an image repository.
 You can tackle this challenge using any technology you want. This is an open-ended task.
 Please provide brief instructions on how to use your application
 
-# Ideas
+## Ideas
 - [ ] SEARCH function
     - from characteristics of the images
     - from text
