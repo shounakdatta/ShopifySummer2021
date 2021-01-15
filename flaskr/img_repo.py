@@ -12,14 +12,17 @@ import os
 repo = Blueprint('imgRepo', __name__)
 
 
-def binary_to_image(row):
-    img_obj = dict(row)
+def get_file_path(img_obj):
     file_type = img_obj['file_type']
     file_name = img_obj['title'] + '-' + str(g.user['id'])
-    file_data = img_obj['img_data']
-    file_path = os.path.join(repo.root_path, 'static/' + secure_filename(
+    return os.path.join(repo.root_path, 'static/' + secure_filename(
         file_name + file_type))
-    print(file_path, file_name, file_type)
+
+
+def binary_to_image(row):
+    img_obj = dict(row)
+    file_data = img_obj['img_data']
+    file_path = get_file_path(img_obj)
     with open(file_path, "wb") as outfile:
         outfile.write(file_data)
     img_obj['path'] = file_path
@@ -70,7 +73,7 @@ def create():
 
 def check_img_exists(id, check_author=True):
     img = get_db().execute(
-        'SELECT i.id, owner_id'
+        'SELECT i.id, i.title, i.img_data, i.file_type, i.created, i.owner_id'
         ' FROM img i JOIN user u ON i.owner_id = u.id'
         ' WHERE i.id = ?',
         (id,)
@@ -84,16 +87,20 @@ def check_img_exists(id, check_author=True):
         abort(403)
         return False
 
-    return True
+    return img
 
 
 @repo.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete(id):
-    img_exists = check_img_exists(id)
+    img = check_img_exists(id)
 
-    if img_exists:
+    if img:
+        file_path = get_file_path(dict(img))
         db = get_db()
         db.execute('DELETE FROM img WHERE id = ?', (id,))
         db.commit()
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
         return redirect(url_for('imgRepo.index'))
