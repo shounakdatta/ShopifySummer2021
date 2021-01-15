@@ -19,8 +19,10 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from . import auth
+    from . import auth, img_repo
     app.register_blueprint(auth.bp)
+    app.register_blueprint(img_repo.repo)
+    app.add_url_rule('/', endpoint='index')
 
     @app.route('/hello')
     def hello():
