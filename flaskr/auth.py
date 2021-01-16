@@ -33,7 +33,6 @@ def register():
                 "INSERT INTO users (username, password) VALUES ('{}', '{}')".format(
                     username, generate_password_hash(password))
             )
-            db.commit()
             return redirect(url_for('auth.login'))
 
         flash(error)
