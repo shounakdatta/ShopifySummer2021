@@ -40,7 +40,7 @@ def index():
     db = get_db()
     imgs = db.execute(
         'SELECT i.id, i.title, i.img_data, i.file_type, i.created'
-        ' FROM img i JOIN user u ON i.owner_id = u.id'
+        ' FROM img i JOIN users u ON i.owner_id = u.id'
         ' ORDER BY i.created DESC'
     ).fetchall()
     saved_imgs = map(binary_to_image, imgs)
@@ -79,7 +79,7 @@ def create():
 def check_img_exists(id, check_author=True):
     img = get_db().execute(
         'SELECT i.id, i.title, i.img_data, i.file_type, i.created, i.owner_id'
-        ' FROM img i JOIN user u ON i.owner_id = u.id'
+        ' FROM img i JOIN users u ON i.owner_id = u.id'
         ' WHERE i.id = ?',
         (id,)
     ).fetchone()

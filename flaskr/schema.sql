@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS img;
 
-CREATE TABLE user (
+CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL
@@ -14,7 +14,7 @@ CREATE TABLE post (
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   title TEXT NOT NULL,
   body TEXT NOT NULL,
-  FOREIGN KEY (author_id) REFERENCES user (id)
+  FOREIGN KEY (author_id) REFERENCES users (id)
 );
 
 CREATE TABLE img (
@@ -24,5 +24,5 @@ CREATE TABLE img (
   title TEXT NOT NULL,
   img_data BLOB NOT NULL,
   file_type TEXT NOT NULL,
-  FOREIGN KEY (owner_id) REFERENCES user (id)
+  FOREIGN KEY (owner_id) REFERENCES ususerser (id)
 )
