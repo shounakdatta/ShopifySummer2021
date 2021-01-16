@@ -9,5 +9,6 @@ setup(
         "flake8 >= 3.8.3",
         "pytest >= 6.0.1",
         "python-dotenv >= 0.15.0",
+        "gunicorn >= 20.0.4",
     ]
 )
