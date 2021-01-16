@@ -1,2 +1,2 @@
-web: gunicorn flaskr:app
+web: flask run
 init: flask init-db
