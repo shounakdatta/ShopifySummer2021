@@ -48,7 +48,7 @@ def login():
         db = get_db()
         error = None
         user = db.execute(
-            'SELECT * FROM users WHERE username = "{}"'.format(username)
+            "SELECT * FROM users WHERE username = '{}'".format(username)
         ).fetchone()
 
         if user is None:
