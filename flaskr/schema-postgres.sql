@@ -22,7 +22,7 @@ CREATE TABLE img (
   owner_id INTEGER NOT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   title TEXT NOT NULL,
-  img_data BLOB NOT NULL,
+  img_data BYTEA NOT NULL,
   file_type TEXT NOT NULL,
   FOREIGN KEY (owner_id) REFERENCES ususerser (id)
 )
