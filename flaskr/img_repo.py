@@ -12,9 +12,13 @@ import os
 repo = Blueprint('imgRepo', __name__)
 
 
+def get_file_name(img_obj):
+    return img_obj['title'] + '-' + str(g.user['id'])
+
+
 def get_file_path(img_obj):
     file_type = img_obj['file_type']
-    file_name = img_obj['title'] + '-' + str(g.user['id'])
+    file_name = get_file_name(img_obj)
     return os.path.join(repo.root_path, 'static/' + secure_filename(
         file_name + file_type))
 
@@ -23,9 +27,10 @@ def binary_to_image(row):
     img_obj = dict(row)
     file_data = img_obj['img_data']
     file_path = get_file_path(img_obj)
+    file_name = get_file_name(img_obj)
     with open(file_path, "wb") as outfile:
         outfile.write(file_data)
-    img_obj['path'] = file_path
+    img_obj['name'] = file_name
     return img_obj
 
 
