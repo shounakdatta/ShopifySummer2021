@@ -41,7 +41,10 @@ def init_db():
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+        if os.environ.get('DATABASE_URL') is None:
+            db.executescript(f.read().decode('utf8'))
+        else:
+            db.execute(f.read())
 
 
 # Defines a CLI command called init-db which calls the init-db function above
