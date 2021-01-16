@@ -38,11 +38,12 @@ def binary_to_image(row):
 @login_required
 def index():
     db = get_db()
-    imgs = db.execute(
+    db.execute(
         'SELECT i.id, i.title, i.img_data, i.file_type, i.created'
         ' FROM img i JOIN users u ON i.owner_id = u.id'
         ' ORDER BY i.created DESC'
-    ).fetchall()
+    )
+    imgs = db.fetchall()
     saved_imgs = map(binary_to_image, imgs)
     return render_template('img_repo/index.html', imgs=saved_imgs)
 
