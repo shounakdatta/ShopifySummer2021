@@ -29,8 +29,8 @@ def register():
 
         if error is None:
             db.execute(
-                'INSERT INTO users (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
+                'INSERT INTO users (username, password) VALUES ({}, {})'.format(
+                    username, generate_password_hash(password))
             )
             db.commit()
             return redirect(url_for('auth.login'))
@@ -48,7 +48,7 @@ def login():
         db = get_db()
         error = None
         user = db.execute(
-            'SELECT * FROM users WHERE username = ?', (username,)
+            'SELECT * FROM users WHERE username = {}'.format(username)
         ).fetchone()
 
         if user is None:
@@ -74,7 +74,7 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute(
-            'SELECT * FROM users WHERE id = ?', (user_id,)
+            'SELECT * FROM users WHERE id = {}'.format(user_id)
         ).fetchone()
 
 
