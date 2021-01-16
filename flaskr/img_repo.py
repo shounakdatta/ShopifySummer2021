@@ -8,6 +8,7 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 from typing import IO
 import os
+import psycopg2
 
 repo = Blueprint('imgRepo', __name__)
 
@@ -68,8 +69,8 @@ def create():
             db = get_db()
             db.execute(
                 "INSERT INTO img (title, img_data, file_type, owner_id)"
-                " VALUES ('{}', E'{}', '{}', {})".format(
-                    title, img_data, file_type, g.user['id'])
+                " VALUES ('{}', {}, '{}', {})".format(
+                    title, psycopg2.Binary(img_data), file_type, g.user['id'])
             )
             return redirect(url_for('imgRepo.index'))
 
