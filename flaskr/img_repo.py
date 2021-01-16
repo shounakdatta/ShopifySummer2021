@@ -68,7 +68,7 @@ def create():
             db = get_db()
             db.execute(
                 "INSERT INTO img (title, img_data, file_type, owner_id)"
-                " VALUES ('{}', {}, '{}', {})".format(
+                " VALUES ('{}', E'{}', '{}', {})".format(
                     title, img_data, file_type, g.user['id'])
             )
             return redirect(url_for('imgRepo.index'))
