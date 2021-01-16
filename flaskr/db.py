@@ -17,7 +17,9 @@ def get_db():
             g.db.row_factory = sqlite3.Row
         else:
             DATABASE_URL = os.environ['DATABASE_URL']
-            g.db = psycopg2.connect(DATABASE_URL, sslmode='require').cursor()
+            connection = psycopg2.connect(DATABASE_URL, sslmode='require')
+            connection.autocommit = True
+            g.db = connection.cursor()
 
     return g.db
 
@@ -38,7 +40,7 @@ def init_db():
         with current_app.open_resource('schema.sql') as f:
             db.executescript(f.read().decode('utf8'))
     else:
-        with current_app.open_resource('schema-postgres.sql') as f:
+        with current_app.open_resource('schema-postgres.sql', "r") as f:
             db.execute(f.read())
 
 
