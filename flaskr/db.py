@@ -23,7 +23,7 @@ def get_db():
             g.db.row_factory = sqlite3.Row
         else:
             DATABASE_URL = os.environ['DATABASE_URL']
-            g.db = psycopg2.connect(DATABASE_URL, sslmode='require')
+            g.db = psycopg2.connect(DATABASE_URL, sslmode='require').cursor()
 
     return g.db
 
