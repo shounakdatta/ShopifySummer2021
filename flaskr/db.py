@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import psycopg2
+import psycopg2.extras
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
@@ -19,7 +20,7 @@ def get_db():
             DATABASE_URL = os.environ['DATABASE_URL']
             connection = psycopg2.connect(DATABASE_URL, sslmode='require')
             connection.autocommit = True
-            g.db = connection.cursor()
+            g.db = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     return g.db
 
