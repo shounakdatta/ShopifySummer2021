@@ -10,5 +10,6 @@ setup(
         "pytest >= 6.0.1",
         "python-dotenv >= 0.15.0",
         "gunicorn >= 20.0.4",
+        "psycopg2 >= 2.8.6",
     ]
 )
