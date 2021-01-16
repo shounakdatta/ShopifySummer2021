@@ -67,23 +67,23 @@ def create():
             print(title, file_type)
             db = get_db()
             db.execute(
-                'INSERT INTO img (title, img_data, file_type, owner_id)'
-                ' VALUES (?, ?, ?, ?)',
-                (title, img_data, file_type, g.user['id'])
+                "INSERT INTO img (title, img_data, file_type, owner_id)"
+                " VALUES ('{}', {}, '{}', {})".format(
+                    title, img_data, file_type, g.user['id'])
             )
-            db.commit()
             return redirect(url_for('imgRepo.index'))
 
     return render_template('img_repo/create.html')
 
 
 def check_img_exists(id, check_author=True):
-    img = get_db().execute(
+    db = get_db()
+    db.execute(
         'SELECT i.id, i.title, i.img_data, i.file_type, i.created, i.owner_id'
         ' FROM img i JOIN users u ON i.owner_id = u.id'
-        ' WHERE i.id = ?',
-        (id,)
-    ).fetchone()
+        ' WHERE i.id = {}'.format(id)
+    )
+    img = db.fetchone()
 
     if img is None:
         abort(404, "Image doesn't exist.")
@@ -104,8 +104,7 @@ def delete(id):
     if img:
         file_path = get_file_path(dict(img))
         db = get_db()
-        db.execute('DELETE FROM img WHERE id = ?', (id,))
-        db.commit()
+        db.execute("DELETE FROM img WHERE id = {}".format(id))
         if os.path.exists(file_path):
             os.remove(file_path)
 
