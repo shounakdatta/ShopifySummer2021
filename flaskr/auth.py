@@ -51,7 +51,7 @@ def login():
             "SELECT * FROM users WHERE username = '{}'".format(username)
         )
         user = db.fetchone()
-        print(password)
+        print(password, user['password'])
 
         if user is None:
             error = 'Incorrect username.'
