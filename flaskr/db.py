@@ -9,12 +9,6 @@ from flask.cli import with_appcontext
 # Retrieves existing db instance or creates a new one
 def get_db():
     if 'db' not in g:
-        # g.db = sqlite3.connect(
-        #     current_app.config['DATABASE'],
-        #     detect_types=sqlite3.PARSE_DECLTYPES
-        # )
-        # g.db.row_factory = sqlite3.Row
-
         if os.environ.get('DATABASE_URL') is None:
             g.db = sqlite3.connect(
                 current_app.config['DATABASE'],
@@ -40,10 +34,11 @@ def close_db(e=None):
 def init_db():
     db = get_db()
 
-    with current_app.open_resource('schema.sql') as f:
-        if os.environ.get('DATABASE_URL') is None:
+    if os.environ.get('DATABASE_URL') is None:
+        with current_app.open_resource('schema.sql') as f:
             db.executescript(f.read().decode('utf8'))
-        else:
+    else:
+        with current_app.open_resource('schema-postgres.sql') as f:
             db.execute(f.read())
 
 
