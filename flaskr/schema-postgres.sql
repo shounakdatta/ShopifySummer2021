@@ -24,5 +24,5 @@ CREATE TABLE img (
   title TEXT NOT NULL,
   img_data BYTEA NOT NULL,
   file_type TEXT NOT NULL,
-  FOREIGN KEY (owner_id) REFERENCES ususerser (id)
+  FOREIGN KEY (owner_id) REFERENCES users (id)
 )
