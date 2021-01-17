@@ -8,18 +8,32 @@
 {% endblock %}
 
 {% block content %}
+<form action="{{ url_for('index') }}" method="post">
+    <label for="search">Search</label>
+    <input name="search" id="search" required>
+    <div class="scope-container" style="display: flex;">
+        <input type="radio" id="private" name="scope" value="private" checked>
+        <label for="private" style="margin-right: 5%;">Private Only</label>
+        <input type="radio" id="public" name="scope" value="public">
+        <label for="public">All</label>
+    </div>
+    <input type="submit" value="Search">
+</form>
 {% for img in imgs %}
 <article class="img">
     <header>
         <div>
-            <h1>{{ '{} - {}'.format(img['title'], img['created'].strftime('%Y-%m-%d'))}}</h1>
+            <h1>{{ '{} - {}'.format(img['given_title'] if img['given_title'] else img['title'],
+                img['created'].strftime('%Y-%m-%d'))}}</h1>
         </div>
         {% if g.user['id'] == img['author_id'] %}
         <a class="action" href="{{ url_for('img_repo.update', id=img['id']) }}">Edit</a>
         {% endif %}
+        {% if g.user['id'] == img['owner_id'] %}
         <form action="{{ url_for('imgRepo.delete', id=img['id']) }}" method="post">
             <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
         </form>
+        {% endif %}
         <img src="{{ url_for('static', filename=(img['name']+img['file_type'])) }}" alt="" width="100%">
     </header>
 </article>

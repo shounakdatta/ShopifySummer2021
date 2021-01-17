@@ -13,14 +13,13 @@ repo = Blueprint('imgRepo', __name__)
 
 
 def get_file_name(img_obj):
-    return img_obj['title'] + '-' + str(g.user['id'])
+    return secure_filename(img_obj['title']) + '-' + str(g.user['id'])
 
 
 def get_file_path(img_obj):
     file_type = img_obj['file_type']
     file_name = get_file_name(img_obj)
-    return os.path.join(repo.root_path, 'static/' + secure_filename(
-        file_name + file_type))
+    return os.path.join(repo.root_path, 'static/' + file_name + file_type)
 
 
 def binary_to_image(row):
@@ -34,25 +33,48 @@ def binary_to_image(row):
     return img_obj
 
 
-@repo.route('/')
+@repo.route('/', methods=('GET', 'POST'))
 @login_required
 def index():
     db = get_db()
-    db.execute(
-        'SELECT i.id, i.title, i.img_data, i.file_type, i.created'
-        ' FROM img i JOIN users u ON i.owner_id = u.id'
-        ' ORDER BY i.created DESC'
-    )
+    if request.method == 'GET':
+        print('personal')
+        db.execute(
+            'SELECT i.id, i.title, i.given_title, i.img_data, i.file_type, i.created, i.owner_id'
+            ' FROM img i WHERE i.owner_id = %s'
+            ' ORDER BY i.created DESC',
+            (g.user['id'],)
+        )
+    else:
+        search = request.form['search']
+        scope = request.form['scope']
+        if scope == 'private':
+            db.execute(
+                "SELECT i.id, i.title, i.given_title, i.img_data, i.file_type, i.created FROM img i"
+                " WHERE (i.title LIKE %(like)s OR i.given_title LIKE %(like)s) AND i.owner_id = %(id)s"
+                " ORDER BY i.created DESC;",
+                ({'like': '%' + search + '%', 'id': g.user['id']})
+            )
+        else:
+            db.execute(
+                "SELECT i.id, i.title, i.given_title, i.img_data, i.file_type, i.created, i.owner_id FROM img i"
+                " WHERE (i.title LIKE %(like)s OR i.given_title LIKE %(like)s)"
+                " AND (i.owner_id = %(id)s OR i.public = True)"
+                " ORDER BY i.created DESC;",
+                ({'like': '%' + search + '%', 'id': g.user['id']})
+            )
     imgs = db.fetchall()
     saved_imgs = map(binary_to_image, imgs)
     return render_template('img_repo/index.html', imgs=saved_imgs)
 
 
-@repo.route('/create', methods=('GET', 'POST'))
-@login_required
+@ repo.route('/create', methods=('GET', 'POST'))
+@ login_required
 def create():
     if request.method == 'POST':
+        given_title = request.form['title']
         img_file: IO = request.files['imgFile']
+        public = True if 'public' in request.form else False
         error = None
 
         if not img_file:
@@ -64,12 +86,11 @@ def create():
             img_data = img_file.read()
             file_name = img_file.filename
             title, file_type = os.path.splitext(file_name)
-            print(title, file_type)
             db = get_db()
             db.execute(
-                "INSERT INTO img (title, img_data, file_type, owner_id)"
-                " VALUES ('{}', {}, '{}', {})".format(
-                    title, psycopg2.Binary(img_data), file_type, g.user['id'])
+                "INSERT INTO img (title, given_title, img_data, file_type, public, owner_id)"
+                " VALUES ('{}', '{}', {}, '{}', {}, {})".format(
+                    title, given_title, psycopg2.Binary(img_data), file_type, public, g.user['id'])
             )
             return redirect(url_for('imgRepo.index'))
 
@@ -96,8 +117,8 @@ def check_img_exists(id, check_author=True):
     return img
 
 
-@repo.route('/<int:id>/delete', methods=('POST',))
-@login_required
+@ repo.route('/<int:id>/delete', methods=('POST',))
+@ login_required
 def delete(id):
     img = check_img_exists(id)
 
